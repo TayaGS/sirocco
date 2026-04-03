@@ -760,7 +760,9 @@ fixed concentration file. \n\
 
   strcpy (answer, "adiabatic");
 
-  thermal_opt = rdchoice ("Wind_heating.extra_processes(none,adiabatic,nonthermal,both)", "1,0,2,3", answer);
+  /* usr_heat: keep the parsed Wind_heating.extra_processes mode so later validation can distinguish import. */
+  thermal_opt = rdchoice ("Wind_heating.extra_processes(none,adiabatic,nonthermal,both,import)", "1,0,2,3,4", answer);
+  geo.extra_processes = thermal_opt;
 
   if (thermal_opt == 0)
   {
@@ -783,6 +785,11 @@ fixed concentration file. \n\
   {
     geo.adiabatic = 1;
     geo.nonthermal = 1;
+  }
+  else if (thermal_opt == 4)
+  {
+    geo.adiabatic = 0;
+    geo.nonthermal = 0;
   }
   else
   {

@@ -598,6 +598,7 @@ struct geometry
   int model_count;              /**< The number of distinct models that have been read in */
 
   double mdot_norm;             /**< A normalization factor used in SV wind, and Knigge wind */
+  int extra_processes;          /**< usr_heat: raw Wind_heating.extra_processes selection */
   int adiabatic;                /**< 0-> Do not include adiabatic heating in calculating the cooling of the wind
                                    1-> Use adiabatic heating in calculating the cooling of the wind
                                  */
