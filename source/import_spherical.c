@@ -73,7 +73,7 @@ import_1d (ndom, filename)
   FILE *fptr;
   char line[LINELENGTH];
   int n, icell, ncell;
-  double r, v_r, mass_rho, t_r, t_e;
+  double r, v_r, mass_rho, t_r, t_e, heating;
 
   Log ("Reading a 1d model %s\n", filename);
 
@@ -86,7 +86,7 @@ import_1d (ndom, filename)
   ncell = 0;
   while (fgets (line, LINELENGTH, fptr) != NULL)
   {
-    n = sscanf (line, " %d %le %le %le %le %le", &icell, &r, &v_r, &mass_rho, &t_e, &t_r);
+    n = sscanf (line, " %d %le %le %le %le %le %le", &icell, &r, &v_r, &mass_rho, &t_e, &t_r, &heating);
     if (n < READ_NO_TEMP_1D)
     {
       continue;
@@ -109,6 +109,13 @@ import_1d (ndom, filename)
         imported_model[ndom].init_temperature = FALSE;
         imported_model[ndom].t_e[ncell] = t_e;
         imported_model[ndom].t_r[ncell] = t_r;
+      }
+      else if (n == READ_BOTH_TEMP_HEATING_1D)
+      {
+        imported_model[ndom].init_temperature = FALSE;
+        imported_model[ndom].t_e[ncell] = t_e;
+        imported_model[ndom].t_r[ncell] = t_r;
+        imported_model[ndom].heating[ncell] = heating;  // usr_heat
       }
       else
       {
@@ -451,4 +458,45 @@ temperature_1d (int ndom, double *x, int return_t_e)
   }
 
   return temperature;
+}
+
+
+
+/* ************************************************************************** */
+/**
+ * @brief      Get the imported heating value at a position x
+ *
+ * @param[in] int    ndom        The domain for the imported model
+ * @param[in] double *x          A position (3d)
+ *
+ * @return     The imported heating in cgs units
+ *
+ * ************************************************************************** */
+
+double
+heating_1d (int ndom, double *x)
+{
+  int n;
+  double r;
+  double heating = 0;
+
+  r = length (x);
+
+  n = 0;
+  while (r >= imported_model[ndom].r[n] && n < imported_model[ndom].ncell)
+  {
+    n++;
+  }
+  n--;
+
+  if (n < imported_model[ndom].ncell)
+  {
+    heating = imported_model[ndom].heating[n];
+  }
+  else
+  {
+    heating = imported_model[ndom].heating[imported_model[ndom].ncell - 1];
+  }
+
+  return heating;
 }

@@ -79,7 +79,7 @@ import_rtheta (ndom, filename)
   int n, icell, jcell, ncell, inwind;
   int jz, jx;
   double delta;
-  double r, theta, v_x, v_y, v_z, rho, t_r, t_e;
+  double r, theta, v_x, v_y, v_z, rho, t_r, t_e, heating;
   double mid_z;
 
 
@@ -96,7 +96,8 @@ import_rtheta (ndom, filename)
   ncell = 0;
   while (fgets (line, LINELENGTH, fptr) != NULL)
   {
-    n = sscanf (line, " %d %d %d %le %le %le %le %le %le %le %le", &icell, &jcell, &inwind, &r, &theta, &v_x, &v_y, &v_z, &rho, &t_e, &t_r);
+    n = sscanf (line, " %d %d %d %le %le %le %le %le %le %le %le %le", &icell, &jcell, &inwind, &r, &theta, &v_x, &v_y, &v_z, &rho, &t_e,
+                &t_r, &heating);
 
     if (n < READ_NO_TEMP_2D)
     {
@@ -125,6 +126,13 @@ import_rtheta (ndom, filename)
         imported_model[ndom].init_temperature = FALSE;
         imported_model[ndom].t_e[ncell] = t_e;
         imported_model[ndom].t_r[ncell] = t_r;
+      }
+      else if (n == READ_BOTH_TEMP_HEATING_2D)
+      {
+        imported_model[ndom].init_temperature = FALSE;
+        imported_model[ndom].t_e[ncell] = t_e;
+        imported_model[ndom].t_r[ncell] = t_r;
+        imported_model[ndom].heating[ncell] = heating;  // usr_heat
       }
       else
       {
@@ -618,4 +626,51 @@ temperature_rtheta (int ndom, double *x, int return_t_e)
   }
 
   return (temperature);
+}
+
+
+
+/* ************************************************************************** */
+/**
+ * @brief      Get the imported heating value at a position x
+ *
+ * @param[in] int    ndom        The domain for the imported model
+ * @param[in] double *x          A position (3d)
+ *
+ * @return     The imported heating in cgs units
+ *
+ * ************************************************************************** */
+
+double
+heating_rtheta (int ndom, double *x)
+{
+  int i, j, n;
+  double r, z;
+  double ctheta, angle;
+  double heating = 0;
+
+  r = length (x);
+  z = fabs (x[2]);
+
+  ctheta = z / r;
+  angle = acos (ctheta) * RADIAN;
+
+  i = 0;
+  while (angle > imported_model[ndom].wind_z[i] && i < imported_model[ndom].mdim)
+  {
+    i++;
+  }
+  i--;
+
+  j = 0;
+  while (r > imported_model[ndom].wind_x[j] && j < imported_model[ndom].ndim)
+  {
+    j++;
+  }
+  j--;
+
+  n = j * imported_model[ndom].mdim + i;
+  heating = imported_model[ndom].heating[n];
+
+  return heating;
 }

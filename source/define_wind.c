@@ -334,10 +334,16 @@ create_plasma_grid (void)
     {
       plasmamain[n_plasma].cool_adiabatic = 0.0;
     }
+    nwind = plasmamain[n_plasma].nwind;
+
     if (geo.nonthermal)
     {
-      nwind = plasmamain[n_plasma].nwind;
       plasmamain[n_plasma].heat_shock = shock_heating (&w[nwind]);
+    }
+    else if (geo.extra_processes == 4 && zdom[w[nwind].ndom].wind_type == IMPORT)
+    {
+      /* usr_heat: imported heating is read as erg/s/cm^3 and converted to cell erg/s for heat_shock. */
+      plasmamain[n_plasma].heat_shock = import_heating (w[nwind].ndom, w[nwind].xcen) * plasmamain[n_plasma].vol;
     }
     else
     {
