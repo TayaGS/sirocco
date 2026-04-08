@@ -347,6 +347,11 @@ create_plasma_grid (void)
       nwind = plasmamain[n_plasma].nwind;
       plasmamain[n_plasma].heat_shock = shock_heating (&w[nwind]);
     }
+    else if (geo.use_user_defined_heating)
+    {
+      /* usr_heat: imported heating is read as erg/s/cm^3 and converted to cell erg/s for heat_shock. */
+      plasmamain[n_plasma].heat_shock = import_heating (w[nwind].ndom, w[nwind].xcen) * plasmamain[n_plasma].vol;
+    }
     else
     {
       plasmamain[n_plasma].heat_shock = 0.0;

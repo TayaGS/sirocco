@@ -64,7 +64,7 @@ double
 get_kpkt_heating_f ()
 {
   int n, nwind;
-  double lum, shock_kpkt_luminosity;
+  double lum, shock_kpkt_luminosity, heating_source;
   WindPtr one;
 
   lum = 0.0;
@@ -73,12 +73,19 @@ get_kpkt_heating_f ()
   {
     nwind = plasmamain[n].nwind;
     one = &wmain[nwind];
+    if (geo.use_user_defined_heating)
+    {
+      /* usr_heat: use saved imported heating (via heat_shock) when user-defined heating mode is active. */
+      heating_source = plasmamain[n].heat_shock;
+    }else{
+      heating_source = shock_heating (one);
+    }
 
     /* what we do depends on how the "net heating mode" is defined */
     if (KPKT_NET_HEAT_MODE)
-      shock_kpkt_luminosity = (shock_heating (one) - plasmamain[n].cool_adiabatic);
+      shock_kpkt_luminosity = (heating_source - plasmamain[n].cool_adiabatic);
     else
-      shock_kpkt_luminosity = shock_heating (one);
+      shock_kpkt_luminosity = heating_source;
 
     if (shock_kpkt_luminosity > 0)
     {

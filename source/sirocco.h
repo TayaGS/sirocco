@@ -602,6 +602,7 @@ struct geometry
   int model_count;              /**< The number of distinct models that have been read in */
 
   double mdot_norm;             /**< A normalization factor used in SV wind, and Knigge wind */
+  int use_user_defined_heating; /**< usr_heat: TRUE when imported user heating mode is active */
   int adiabatic;                /**< 0-> Do not include adiabatic heating in calculating the cooling of the wind
                                    1-> Use adiabatic heating in calculating the cooling of the wind
                                  */
@@ -1817,6 +1818,7 @@ struct Import
   double *v_r;                  /**<  the radial velocity in cgs units */
   double *mass_rho;             /**<  the mass density in cgs units */
   double *t_e, *t_r;            /**<  the electron and radiation temperature in Kelvin */
+  double *heating;              /**< usr_heat: optional imported heating column by position */
   double *wind_x, *wind_z;      /**<  the wind grid coordinates */
   double *wind_midx, *wind_midz;        /**<  the wind grid mid points */
 };

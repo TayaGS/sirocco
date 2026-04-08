@@ -352,6 +352,20 @@ main (argc, argv)
   init_photons ();
   init_ionization ();
 
+  /* usr_heat: imported extra heating mode is only valid when all wind domains are imported grids. */
+  if (geo.extra_processes == 4)
+  {
+    for (n = 0; n < geo.ndomain; n++)
+    {
+      if (zdom[n].wind_type != IMPORT)
+      {
+        Error ("Wind_heating.extra_processes=import requires Wind.type=imported for all wind domains. Domain %d has Wind.type=%d\n", n,
+               zdom[n].wind_type);
+        Exit (EXIT_FAILURE);
+      }
+    }
+  }
+
   /* Note: ksl - At this point, SYSTEM_TYPE_PREVIOUS refers both to a restart and to a situation where
    * one is starting from an early wind file as implemented this is quite restrictive about what one
    * can change in the previous case.   */
