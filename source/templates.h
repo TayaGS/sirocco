@@ -266,6 +266,7 @@ int import_make_grid(int ndom, WindPtr w);
 double import_velocity(int ndom, double *x, double *v);
 double import_rho(int ndom, double *x);
 double import_temperature(int ndom, double *x, int return_t_e);
+double import_heating(int ndom, double *x);
 /* import_calloc.c */
 void calloc_import(int coord_type, int ndom);
 void free_import(int coord_type, int ndom);
@@ -276,6 +277,7 @@ int cylindrical_make_grid_import(WindPtr w, int ndom);
 double velocity_cylindrical(int ndom, double *x, double *v);
 double rho_cylindrical(int ndom, double *x);
 double temperature_cylindrical(int ndom, double *x, int return_t_e);
+double heating_cylindrical(int ndom, double *x);
 /* import_rtheta.c */
 int import_rtheta(int ndom, char *filename);
 int import_rtheta_setup_boundaries(int ndom);
@@ -283,6 +285,7 @@ int rtheta_make_grid_import(WindPtr w, int ndom);
 double velocity_rtheta(int ndom, double *x, double *v);
 double rho_rtheta(int ndom, double *x);
 double temperature_rtheta(int ndom, double *x, int return_t_e);
+double heating_rtheta(int ndom, double *x);
 /* import_spherical.c */
 int import_1d(int ndom, char *filename);
 int import_spherical_setup_boundaries(int ndom);
@@ -290,6 +293,7 @@ int spherical_make_grid_import(WindPtr w, int ndom);
 double velocity_1d(int ndom, double *x, double *v);
 double rho_1d(int ndom, double *x);
 double temperature_1d(int ndom, double *x, int return_t_e);
+double heating_1d(int ndom, double *x);
 /* ionization.c */
 void update_old_plasma_variables(PlasmaPtr xplasma);
 int ion_abundances(PlasmaPtr xplasma, int mode);

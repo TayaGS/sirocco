@@ -575,3 +575,45 @@ temperature_cylindrical (int ndom, double *x, int return_t_e)
 
   return temperature;
 }
+
+
+/* ************************************************************************** */
+/**
+ * @brief      Get the imported heating value at a position x
+ *
+ * @param[in] int    ndom        The domain for the imported model
+ * @param[in] double *x          A position (3d)
+ *
+ * @return     The imported heating in cgs units
+ *
+ * ************************************************************************** */
+
+double
+heating_cylindrical (int ndom, double *x)
+{
+  int i, j, n;
+  double r, z;
+  double heating = 0;
+
+  r = sqrt (x[0] * x[0] + x[1] * x[1]);
+  z = fabs (x[2]);
+
+  i = 0;
+  while (z > imported_model[ndom].wind_z[i] && i < imported_model[ndom].mdim)
+  {
+    i++;
+  }
+  i--;
+
+  j = 0;
+  while (r > imported_model[ndom].wind_x[j] && j < imported_model[ndom].ndim)
+  {
+    j++;
+  }
+  j--;
+
+  n = j * imported_model[ndom].mdim + i;
+  heating = imported_model[ndom].heating[n];
+
+  return heating;
+}

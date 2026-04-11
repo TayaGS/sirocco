@@ -333,3 +333,47 @@ import_temperature (int ndom, double *x, int return_t_e)
 
   return temperature;
 }
+
+
+
+/* ************************************************************************** */
+/**
+ * @brief  Get the imported heating value at a position x.
+ *
+ * @param[in] int ndom       The domain of interest
+ * @param[in] double x[3]    The position of interest
+ *
+ * @return       heating      The imported heating contribution at position x
+ *
+ * @details
+ *
+ * This function dispatches to coordinate-specific imported-grid heating
+ * lookups. If no heating column was parsed, the imported arrays are zeroed.
+ *
+ * ************************************************************************** */
+
+double
+import_heating (int ndom, double *x)
+{
+  double heating = 0;
+
+  if (zdom[ndom].coord_type == SPHERICAL)
+  {
+    heating = heating_1d (ndom, x);
+  }
+  else if (zdom[ndom].coord_type == CYLIND)
+  {
+    heating = heating_cylindrical (ndom, x);
+  }
+  else if (zdom[ndom].coord_type == RTHETA)
+  {
+    heating = heating_rtheta (ndom, x);
+  }
+  else
+  {
+    Error ("import_heating: unknown coord_type %d\n", zdom[ndom].coord_type);
+    Exit (1);
+  }
+
+  return heating;
+}
