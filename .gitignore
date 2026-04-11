@@ -121,3 +121,7 @@ scratch/
 *-e 
 
 
+instructions
+.github/copilot-instructions.md
+docs/notes/imported-heating-implementation-stages.md
+.gitignore

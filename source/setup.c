@@ -42,7 +42,7 @@
  *
  * ### Notes ###
  *
- * In general, cgs units are the working units for Python.  Thus all
+ * In general, cgs units are the working units for Sirocco.  Thus all
  * intialization should be converted to these units.
  *
  * @bug Currently init_geo is set up for CVs and Stars and not AGN.  We now
@@ -593,10 +593,15 @@ init_observers ()
  * @return     Generally returns 0
  *
  * @details
- * ??? DESCRIPTION ???
+ *
+ * The routine reads the input variables associated with the
+ * number of photons per cycle, the number of ionization 
+ * cycles and the number of spectral cycle
  *
  * ### Notes ###
  * The routine also allocates memory for the photon structure.
+ * (for each thread) 
+ * 
  * If the routine is unable to allocate this membory, the routine
  * will exit.
  *
@@ -605,7 +610,6 @@ init_observers ()
 PhotPtr
 init_photons ()
 {
-  PhotPtr p;
 
   /* Although Photons_per_cycle is really an integer,
      read in as a double so it is easier for input
@@ -621,10 +625,6 @@ init_photons ()
   }
 
 
-#ifdef MPI_ON
-  Log ("Photons per cycle per MPI task will be %d\n", NPHOT / np_mpi_global);
-  NPHOT /= np_mpi_global;
-#endif
 
   rdint ("Ionization_cycles", &geo.wcycles);
 
@@ -651,33 +651,7 @@ init_photons ()
     Log ("After that, the windsave file will be written to disk but then the program will exit\n");
   }
 
-  /* Allocate the memory for the photon structure now that NPHOT is established */
-
-  photmain = p = (PhotPtr) calloc (sizeof (p_dummy), NPHOT);
-  /* If the number of photons per cycle is changed, NPHOT can be less, so we define NPHOT_MAX
-   * to the maximum number of photons that one can create.  NPHOT is used extensively with
-   * Python.  It is the NPHOT in a particular cycle, in a given thread.
-   */
-
-  NPHOT_MAX = NPHOT;
-
-
-  if (p == NULL)
-  {
-    Error ("init_photons: There is a problem in allocating memory for the photon structure\n");
-    Exit (0);
-  }
-  else
-  {
-    /* large photon numbers can cause problems / runs to crash. Report to use (see #209) */
-    Log
-      ("Allocated %10d bytes for each of %5d elements of photon structure totaling %10.1f Mb \n",
-       sizeof (p_dummy), NPHOT, 1.e-6 * NPHOT * sizeof (p_dummy));
-    if ((NPHOT * sizeof (p_dummy)) > 1e9)
-      Error ("Over 1 GIGABYTE of photon structure allocated. Could cause serious problems.\n");
-  }
-
-  return (p);
+  return (0);
 }
 
 
@@ -714,7 +688,8 @@ init_ionization ()
 
   strcpy (answer, "matrix_bb");
   geo.ioniz_mode =
-    rdchoice ("Wind.ionization(on.the.spot,ML93,LTE_tr,LTE_te,fixed,matrix_bb,matrix_pow,matrix_est)", "0,3,1,4,2,8,9,10", answer);
+    rdchoice ("Wind.ionization(on.the.spot,ML93,LTE_tr,LTE_te,LTE_iterate,fixed,matrix_bb,matrix_pow,matrix_est,matrix_multishot)",
+              "0,3,1,4,5,2,8,9,10,11", answer);
 
   if (geo.ioniz_mode == IONMODE_FIXED)
   {
@@ -762,8 +737,6 @@ fixed concentration file. \n\
 
   /* usr_heat: keep the parsed Wind_heating.extra_processes mode so later validation can distinguish import. */
   thermal_opt = rdchoice ("Wind_heating.extra_processes(none,adiabatic,nonthermal,both,import)", "1,0,2,3,4", answer);
-  geo.extra_processes = thermal_opt;
-
   if (thermal_opt == 0)
   {
     geo.adiabatic = 1;
@@ -935,8 +908,8 @@ setup_atomic_data (const char *atomic_filename)
 
   /*
    * Check that geo.atomic_filename exists - i.e. that the directory is readable
-   * and in the directory Python is being executed from. If it isn't - then
-   * try to run Setup_Sirocco_Dir. If both fail, then warn the user and exit Python
+   * and in the directory Sirocco is being executed from. If it isn't - then
+   * try to run Setup_Sirocco_Dir. If both fail, then warn the user and exit Sirocco
    */
 
   if (stat (atomic_filename, &file_stat))
