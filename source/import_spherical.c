@@ -86,7 +86,7 @@ import_1d (ndom, filename)
   ncell = 0;
   while (fgets (line, LINELENGTH, fptr) != NULL)
   {
-    n = sscanf (line, " %d %d %le %le %le %le %le", &icell, &inwind, &r, &v_r, &mass_rho, &t_e, &t_r, &heating);
+    n = sscanf (line, " %d %d %le %le %le %le %le %le", &icell, &inwind, &r, &v_r, &mass_rho, &t_e, &t_r, &heating);
     if (n < READ_NO_TEMP_1D)
     {
       continue;
@@ -393,12 +393,14 @@ rho_1d (ndom, x)
   }
   n--;
 
-  if (n < 0)
-    n = 0;
-  if (n >= imported_model[ndom].ncell)
-    n = imported_model[ndom].ncell - 1;
-
-  rho = imported_model[ndom].mass_rho[n];
+  if (n < imported_model[ndom].ncell)
+  {
+    rho = imported_model[ndom].mass_rho[n];
+  }
+  else
+  {
+    rho = imported_model[ndom].mass_rho[imported_model[ndom].ncell - 1];
+  }
 
   return (rho);
 }
@@ -444,15 +446,20 @@ temperature_1d (int ndom, double *x, int return_t_e)
     }
     n--;
 
-    if (n < 0)
-      n = 0;
-    if (n >= imported_model[ndom].ncell)
-      n = imported_model[ndom].ncell - 1;
-
-    if (return_t_e)
-      temperature = imported_model[ndom].t_e[n];
+    if (n < imported_model[ndom].ncell)
+    {
+      if (return_t_e)
+        temperature = imported_model[ndom].t_e[n];
+      else
+        temperature = imported_model[ndom].t_r[n];
+    }
     else
-      temperature = imported_model[ndom].t_r[n];
+    {
+      if (return_t_e)
+        temperature = imported_model[ndom].t_e[imported_model[ndom].ncell - 1];
+      else
+        temperature = imported_model[ndom].t_r[imported_model[ndom].ncell - 1];
+    }
   }
 
   return temperature;
@@ -487,12 +494,14 @@ heating_1d (int ndom, double *x)
   }
   n--;
 
-  if (n < 0)
-    n = 0;
-  if (n >= imported_model[ndom].ncell)
-    n = imported_model[ndom].ncell - 1;
-
-  heating = imported_model[ndom].heating[n];
+  if (n < imported_model[ndom].ncell)
+  {
+    heating = imported_model[ndom].heating[n];
+  }
+  else
+  {
+    heating = imported_model[ndom].heating[imported_model[ndom].ncell - 1];
+  }
 
   return heating;
 }
