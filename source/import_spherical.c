@@ -98,20 +98,22 @@ import_1d (ndom, filename)
       imported_model[ndom].r[ncell] = r;
       imported_model[ndom].v_r[ncell] = v_r;
       imported_model[ndom].mass_rho[ncell] = mass_rho;
-      imported_model[ndom].heating[ncell] = 0.0;  // initialize heat to 0 in case it is not user specified
-
 
       if (n == READ_ELECTRON_TEMP_1D)
       {
         imported_model[ndom].init_temperature = FALSE;
         imported_model[ndom].t_e[ncell] = t_e;
         imported_model[ndom].t_r[ncell] = 1.1 * t_e;
+        imported_model[ndom].heating[ncell] = 0.0;  // heat it is not user specified
+
       }
       else if (n == READ_BOTH_TEMP_1D)
       {
         imported_model[ndom].init_temperature = FALSE;
         imported_model[ndom].t_e[ncell] = t_e;
         imported_model[ndom].t_r[ncell] = t_r;
+        imported_model[ndom].heating[ncell] = 0.0;  // heat it is not user specified
+
       }
       else if (n == READ_BOTH_TEMP_HEATING_1D)
       {
@@ -385,20 +387,18 @@ rho_1d (ndom, x)
   r = length (x);
 
   n = 0;
-  while (r >= imported_model[ndom].r[n] && n < imported_model[ndom].ncell)
+  while (n < imported_model[ndom].ncell && r >= imported_model[ndom].r[n])
   {
     n++;
   }
   n--;
 
-  if (n < imported_model[ndom].ncell)
-  {
-    rho = imported_model[ndom].mass_rho[n];
-  }
-  else
-  {
-    rho = imported_model[ndom].mass_rho[imported_model[ndom].ncell - 1];
-  }
+  if (n < 0)
+    n = 0;
+  if (n >= imported_model[ndom].ncell)
+    n = imported_model[ndom].ncell - 1;
+
+  rho = imported_model[ndom].mass_rho[n];
 
   return (rho);
 }
@@ -438,26 +438,21 @@ temperature_1d (int ndom, double *x, int return_t_e)
     r = length (x);
 
     n = 0;
-    while (r >= imported_model[ndom].r[n] && n < imported_model[ndom].ncell)
+    while (n < imported_model[ndom].ncell && r >= imported_model[ndom].r[n])
     {
       n++;
     }
     n--;
 
-    if (n < imported_model[ndom].ncell)
-    {
-      if (return_t_e)
-        temperature = imported_model[ndom].t_e[n];
-      else
-        temperature = imported_model[ndom].t_r[n];
-    }
+    if (n < 0)
+      n = 0;
+    if (n >= imported_model[ndom].ncell)
+      n = imported_model[ndom].ncell - 1;
+
+    if (return_t_e)
+      temperature = imported_model[ndom].t_e[n];
     else
-    {
-      if (return_t_e)
-        temperature = imported_model[ndom].t_e[imported_model[ndom].ncell - 1];
-      else
-        temperature = imported_model[ndom].t_r[imported_model[ndom].ncell - 1];
-    }
+      temperature = imported_model[ndom].t_r[n];
   }
 
   return temperature;
@@ -486,20 +481,18 @@ heating_1d (int ndom, double *x)
   r = length (x);
 
   n = 0;
-  while (r >= imported_model[ndom].r[n] && n < imported_model[ndom].ncell)
+  while (n < imported_model[ndom].ncell && r >= imported_model[ndom].r[n])
   {
     n++;
   }
   n--;
 
-  if (n < imported_model[ndom].ncell)
-  {
-    heating = imported_model[ndom].heating[n];
-  }
-  else
-  {
-    heating = imported_model[ndom].heating[imported_model[ndom].ncell - 1];
-  }
+  if (n < 0)
+    n = 0;
+  if (n >= imported_model[ndom].ncell)
+    n = imported_model[ndom].ncell - 1;
+
+  heating = imported_model[ndom].heating[n];
 
   return heating;
 }

@@ -18,6 +18,7 @@
 
 #include "atomic.h"
 #include "sirocco.h"
+#include "templates.h"
 
 /**********************************************************/
 /**
@@ -146,8 +147,7 @@ wind_update (WindPtr w)
     else if (geo.use_user_defined_heating)
     {
       Log ("Using user defined heating for cell %d in domain %d\n", n_plasma, w[nwind].ndom);
-      /* usr_heat: imported heating is read as erg/s/cm^3 and converted to cell erg/s for heat_shock. */
-      plasmamain[n_plasma].heat_shock = import_heating (w[nwind].ndom, w[nwind].xcen) * plasmamain[n_plasma].vol;
+      /* usr_heat: imported heating is precomputed and cached in plasmamain[n_plasma].heat_shock. */
     }
     else
     {

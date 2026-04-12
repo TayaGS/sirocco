@@ -535,18 +535,26 @@ rho_rtheta (ndom, x)
   angle = acos (ctheta) * RADIAN;
 
   i = 0;
-  while (angle > imported_model[ndom].wind_z[i] && i < imported_model[ndom].mdim)
+  while (i < imported_model[ndom].mdim && angle > imported_model[ndom].wind_z[i])
   {
     i++;
   }
   i--;
+  if (i < 0)
+    i = 0;
+  if (i >= imported_model[ndom].mdim)
+    i = imported_model[ndom].mdim - 1;
 
   j = 0;
-  while (r > imported_model[ndom].wind_x[j] && j < imported_model[ndom].ndim)
+  while (j < imported_model[ndom].ndim && r > imported_model[ndom].wind_x[j])
   {
     j++;
   }
   j--;
+  if (j < 0)
+    j = 0;
+  if (j >= imported_model[ndom].ndim)
+    j = imported_model[ndom].ndim - 1;
 
   n = j * imported_model[ndom].mdim + i;
 
@@ -596,18 +604,26 @@ temperature_rtheta (int ndom, double *x, int return_t_e)
     angle = acos (ctheta) * RADIAN;
 
     i = 0;
-    while (angle > imported_model[ndom].wind_z[i] && i < imported_model[ndom].mdim)
+    while (i < imported_model[ndom].mdim && angle > imported_model[ndom].wind_z[i])
     {
       i++;
     }
     i--;
+    if (i < 0)
+      i = 0;
+    if (i >= imported_model[ndom].mdim)
+      i = imported_model[ndom].mdim - 1;
 
     j = 0;
-    while (r > imported_model[ndom].wind_x[j] && j < imported_model[ndom].ndim)
+    while (j < imported_model[ndom].ndim && r > imported_model[ndom].wind_x[j])
     {
       j++;
     }
     j--;
+    if (j < 0)
+      j = 0;
+    if (j >= imported_model[ndom].ndim)
+      j = imported_model[ndom].ndim - 1;
 
     n = j * imported_model[ndom].mdim + i;
 
@@ -647,18 +663,26 @@ heating_rtheta (int ndom, double *x)
   angle = acos (ctheta) * RADIAN;
 
   i = 0;
-  while (angle > imported_model[ndom].wind_z[i] && i < imported_model[ndom].mdim)
+  while (i < imported_model[ndom].mdim && angle > imported_model[ndom].wind_z[i])
   {
     i++;
   }
   i--;
+  if (i < 0)
+    i = 0;
+  if (i >= imported_model[ndom].mdim)
+    i = imported_model[ndom].mdim - 1;
 
   j = 0;
-  while (r > imported_model[ndom].wind_x[j] && j < imported_model[ndom].ndim)
+  while (j < imported_model[ndom].ndim && r > imported_model[ndom].wind_x[j])
   {
     j++;
   }
   j--;
+  if (j < 0)
+    j = 0;
+  if (j >= imported_model[ndom].ndim)
+    j = imported_model[ndom].ndim - 1;
 
   n = j * imported_model[ndom].mdim + i;
   heating = imported_model[ndom].heating[n];
