@@ -59,6 +59,7 @@ calloc_import (int coord_type, int ndom)
     imported_model[ndom].mass_rho = calloc (sizeof *imported_model[ndom].mass_rho, NDIM_MAX);
     imported_model[ndom].t_r = calloc (sizeof *imported_model[ndom].t_r, NDIM_MAX);
     imported_model[ndom].t_e = calloc (sizeof *imported_model[ndom].t_e, NDIM_MAX);
+    imported_model[ndom].heating = calloc (sizeof *imported_model[ndom].heating, NDIM_MAX);
   }
   else if (coord_type == CYLIND || coord_type == RTHETA)
   {
@@ -71,6 +72,7 @@ calloc_import (int coord_type, int ndom)
     imported_model[ndom].mass_rho = calloc (sizeof *imported_model[ndom].mass_rho, NDIM_MAX2D);
     imported_model[ndom].t_r = calloc (sizeof *imported_model[ndom].t_r, NDIM_MAX2D);
     imported_model[ndom].t_e = calloc (sizeof *imported_model[ndom].t_e, NDIM_MAX2D);
+    imported_model[ndom].heating = calloc (sizeof *imported_model[ndom].heating, NDIM_MAX2D);
     imported_model[ndom].wind_x = calloc (sizeof *imported_model[ndom].wind_x, NDIM_MAX2D);
     imported_model[ndom].wind_z = calloc (sizeof *imported_model[ndom].wind_z, NDIM_MAX2D);
     imported_model[ndom].wind_midx = calloc (sizeof *imported_model[ndom].wind_midx, NDIM_MAX2D);
@@ -122,6 +124,7 @@ free_import (int coord_type, int ndom)
     free (imported_model[ndom].mass_rho);
     free (imported_model[ndom].t_r);
     free (imported_model[ndom].t_e);
+    free (imported_model[ndom].heating);
   }
   else if (coord_type == CYLIND || coord_type == RTHETA)
   {
@@ -134,6 +137,7 @@ free_import (int coord_type, int ndom)
     free (imported_model[ndom].mass_rho);
     free (imported_model[ndom].t_r);
     free (imported_model[ndom].t_e);
+    free (imported_model[ndom].heating);
     free (imported_model[ndom].wind_x);
     free (imported_model[ndom].wind_z);
     free (imported_model[ndom].wind_midx);
