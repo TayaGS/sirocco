@@ -199,7 +199,9 @@ get_bl_and_agn_params (lstar)
     geo.star_radiation = 0;     // 70b - AGN do not have a star at the center */
     geo.bl_radiation = 0;
     if (geo.agn_radiation)
-      get_spectype (geo.agn_radiation, "Central_object.rad_type_to_make_wind(bb,models,power,cloudy,brems,mono)", &geo.agn_ion_spectype);
+      get_spectype (geo.agn_radiation,
+                    "Central_object.rad_type_to_make_wind(bb,models,power,cloudy,brems,mono,dilute_blackbody)",
+                    &geo.agn_ion_spectype);
 
     if (geo.agn_ion_spectype == SPECTYPE_BB_FCOL)
     {
@@ -327,6 +329,12 @@ get_bl_and_agn_params (lstar)
       rddoub ("Central_object.blackbody_temp(K)", &geo.alpha_agn);
       geo.lum_agn = 4 * PI * geo.rstar * geo.rstar * STEFAN_BOLTZMANN * pow (geo.alpha_agn, 4.);
       Log ("OK, the black hole/AGN lum will be about %.2e the disk lum\n", geo.lum_agn / xbl);
+    }
+    else if (geo.agn_ion_spectype == SPECTYPE_DILUTE_BB)
+    {
+      /* For dilute_blackbody, keep user-input luminosity and use blackbody_temp only for the spectral shape. */
+      rddoub ("Central_object.blackbody_temp(K)", &geo.alpha_agn);
+      Log ("Using dilute_blackbody with user luminosity %.2e and temperature %.2e K\n", geo.lum_agn, geo.alpha_agn);
     }
 
     /* JM 1502 -- lines to add a low frequency power law cutoff. accessible

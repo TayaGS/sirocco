@@ -168,6 +168,7 @@ extern int NWAVE_NOW;         /**< Either NWAVE_IONIZ or NWAVE_EXTRACT depending
 #define SPECTYPE_BREM    (-6)
 #define SPECTYPE_MONO    (-7)
 #define SPECTYPE_BB_FCOL (-8)
+#define SPECTYPE_DILUTE_BB (-9)
 #define SPECTYPE_MODEL	 (-99)  // This is just used briefly, before a model number is assigned
 
 /* definitions of types of colour correction */

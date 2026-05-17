@@ -99,6 +99,22 @@ agn_init (r, lum, alpha, freqmin, freqmax, ioniz_or_extract, f)
     *f = emit;
     *f *= (4. * PI * r * r);
   }
+  else if (spectype == SPECTYPE_DILUTE_BB)
+  {
+    /* Use the user luminosity with a blackbody shape set by alpha (= temperature). */
+    double bb_lum;
+    t = alpha;
+    emit = emittance_bb (freqmin, freqmax, t);
+    emit *= (4. * PI * r * r);
+    bb_lum = 4. * PI * r * r * STEFAN_BOLTZMANN * pow (t, 4.0);
+
+    if (bb_lum <= 0.0)
+    {
+      Error ("agn_init: dilute_blackbody has non-positive bb_lum for T=%g\n", t);
+      Exit (0);
+    }
+    *f = emit * (lum / bb_lum);
+  }
   else if (spectype == SPECTYPE_CL_TAB) //A special broken power law mode made to match cloudy - mainly for testing purposes
   {
     /* Emittance_pow actually returns the specific luminosity directly */
@@ -410,7 +426,7 @@ photo_gen_agn (p, r, alpha, weight, f1, f2, spectype, istart, nphot)
     p[i].nres = -1;             // It's a continuum photon - so it is not made in a resonance
     p[i].nnscat = 1;            // Set to one scatter
 
-    if (spectype == SPECTYPE_BB)        //Blackbody spectrum, we use the supplied temperature
+    if (spectype == SPECTYPE_BB || spectype == SPECTYPE_DILUTE_BB)     //Blackbody spectrum, we use the supplied temperature
     {
       p[i].freq = planck (t, freqmin, freqmax);
     }

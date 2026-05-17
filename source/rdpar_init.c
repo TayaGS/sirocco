@@ -79,12 +79,12 @@ init_choices ()
 {
   /* Initialize the structure that contains all of the types of possible radiation types */
 
-  char *xchoices[] = { "bb", "uniform", "power", "cloudy", "brems", "none", "models", "mod_bb", "mono" };
+  char *xchoices[] = { "bb", "uniform", "power", "cloudy", "brems", "none", "models", "mod_bb", "mono", "dilute_blackbody" };
   int xvals[] =
     { SPECTYPE_BB, SPECTYPE_UNIFORM, SPECTYPE_POW, SPECTYPE_CL_TAB, SPECTYPE_BREM, SPECTYPE_NONE, SPECTYPE_MODEL, SPECTYPE_BB_FCOL,
-    SPECTYPE_MONO
+    SPECTYPE_MONO, SPECTYPE_DILUTE_BB
   };
-  int num_choices = 9;          //Should match the length of xchoices and xvals above. must be <= MAX_RDPAR_CHOICES in sirocco.h 
+  int num_choices = 10;         //Should match the length of xchoices and xvals above. must be <= MAX_RDPAR_CHOICES in sirocco.h 
 
   if (xinit_choices)
     return (0);
