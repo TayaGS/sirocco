@@ -540,10 +540,6 @@ rho_rtheta (ndom, x)
     i++;
   }
   i--;
-  if (i < 0)
-    i = 0;
-  if (i >= imported_model[ndom].mdim)
-    i = imported_model[ndom].mdim - 1;
 
   j = 0;
   while (j < imported_model[ndom].ndim && r > imported_model[ndom].wind_x[j])
@@ -551,10 +547,6 @@ rho_rtheta (ndom, x)
     j++;
   }
   j--;
-  if (j < 0)
-    j = 0;
-  if (j >= imported_model[ndom].ndim)
-    j = imported_model[ndom].ndim - 1;
 
   n = j * imported_model[ndom].mdim + i;
 
@@ -609,10 +601,6 @@ temperature_rtheta (int ndom, double *x, int return_t_e)
       i++;
     }
     i--;
-    if (i < 0)
-      i = 0;
-    if (i >= imported_model[ndom].mdim)
-      i = imported_model[ndom].mdim - 1;
 
     j = 0;
     while (j < imported_model[ndom].ndim && r > imported_model[ndom].wind_x[j])
@@ -620,10 +608,6 @@ temperature_rtheta (int ndom, double *x, int return_t_e)
       j++;
     }
     j--;
-    if (j < 0)
-      j = 0;
-    if (j >= imported_model[ndom].ndim)
-      j = imported_model[ndom].ndim - 1;
 
     n = j * imported_model[ndom].mdim + i;
 
@@ -668,10 +652,6 @@ heating_rtheta (int ndom, double *x)
     i++;
   }
   i--;
-  if (i < 0)
-    i = 0;
-  if (i >= imported_model[ndom].mdim)
-    i = imported_model[ndom].mdim - 1;
 
   j = 0;
   while (j < imported_model[ndom].ndim && r > imported_model[ndom].wind_x[j])
@@ -679,10 +659,6 @@ heating_rtheta (int ndom, double *x)
     j++;
   }
   j--;
-  if (j < 0)
-    j = 0;
-  if (j >= imported_model[ndom].ndim)
-    j = imported_model[ndom].ndim - 1;
 
   n = j * imported_model[ndom].mdim + i;
   heating = imported_model[ndom].heating[n];
