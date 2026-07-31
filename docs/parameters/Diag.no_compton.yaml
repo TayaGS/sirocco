@@ -1,0 +1,10 @@
+name: Diag.no_compton
+description: |
+  Disable Compton scattering when set. This is intended for runs where
+  Compton energy exchange and Compton-related opacity contributions
+  should be skipped entirely.
+type: Boolean (yes/no)
+parent:
+  Diag.extra: true
+file: setup.c
+advanced: true

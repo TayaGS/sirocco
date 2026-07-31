@@ -1659,6 +1659,7 @@ struct advanced_modes
                                   that make it less useful than it might seem. */
   int no_macro_pops_for_ions;     /* if true, then use the ion densities from the ionization mode
                                      for macro-atoms, rather than from macro_pops */
+  int no_compton;                 /* if true, disable Compton scattering */
 };
 
 extern struct advanced_modes modes;
