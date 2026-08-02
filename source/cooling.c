@@ -158,7 +158,7 @@ xtotal_emission (one, f1, f2)
       cooling = xplasma->cool_rr;
       xplasma->lum_lines = total_bb_cooling (xplasma, t_e);
       cooling += xplasma->lum_lines;
-      /* total_bb_cooling gives the total cooling rate due to bb transisions whether they
+  xplasma->cool_comp = total_comp (&wmain[xplasma->nwind], t); // Restore the thermal solver call site
          are macro atoms or simple ions. */
       xplasma->lum_ff = total_free (xplasma, t_e, f1, f2);
       cooling += xplasma->lum_ff;

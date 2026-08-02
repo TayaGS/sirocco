@@ -349,7 +349,7 @@ init_advanced_modes ()
   modes.partial_cells = PC_ZERO_DEN;    /* Default is to omit partial cells in calculation */
 
   modes.no_macro_pops_for_ions = FALSE; /* use the ion densities from macro_pops where applicable */
-  modes.no_compton = FALSE;    /* allow Compton scattering by default */
+  modes.no_compton = FALSE;    /* disable Compton energy exchange when true; scattering stays elastic */
 
   return (0);
 }

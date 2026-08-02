@@ -158,8 +158,16 @@ radiation (PhotPtr p, double ds)
      note that we also call these with the average frequency along ds */
 
   kappa_tot = frac_ff = kappa_ff (xplasma, freq);
-  kappa_tot += frac_comp = kappa_comp (xplasma, freq);
-  kappa_tot += frac_ind_comp = kappa_ind_comp (xplasma, freq);
+  if (modes.no_compton)
+  {
+    frac_comp = 0.0;
+    frac_ind_comp = 0.0;
+  }
+  else
+  {
+    kappa_tot += frac_comp = kappa_comp (xplasma, freq);
+    kappa_tot += frac_ind_comp = kappa_ind_comp (xplasma, freq);
+  }
 
   frac_tot = frac_z = 0;
   frac_auger = 0;
