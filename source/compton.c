@@ -302,6 +302,7 @@ total_comp (one, t_e)
   int nplasma, j;
 
 
+  nplasma = one->nplasma;
   xplasma = &plasmamain[nplasma];
 
   x = 0.0;

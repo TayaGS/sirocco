@@ -109,9 +109,7 @@ cooling (xplasma, t)
  * ### Notes ###
  *
  * It returns the total cooling in the CMF, and also cooling due
- * to various types of emission, e.g ff and  lines into the
- * Plasma cells. The fb cooling calculated here is *not* equal to
- * the fb luminosity and so this value is stored in cool_rr.
+* to various types of emission, e.g ff and  lines into the
  *
  * @bug The call to this routine was changed when PlasmaPtrs
  * were introduced, but it appears that the various routines
@@ -158,7 +156,7 @@ xtotal_emission (one, f1, f2)
       cooling = xplasma->cool_rr;
       xplasma->lum_lines = total_bb_cooling (xplasma, t_e);
       cooling += xplasma->lum_lines;
-  xplasma->cool_comp = total_comp (&wmain[xplasma->nwind], t); // Restore the thermal solver call site
+      /* total_bb_cooling gives the total cooling rate due to bb transisions whether they
          are macro atoms or simple ions. */
       xplasma->lum_ff = total_free (xplasma, t_e, f1, f2);
       cooling += xplasma->lum_ff;
