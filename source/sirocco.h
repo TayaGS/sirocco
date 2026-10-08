@@ -140,7 +140,7 @@ extern int NWAVE_NOW;         /**< Either NWAVE_IONIZ or NWAVE_EXTRACT depending
                                 */
 
 
-#define NWAVE_IONIZ 10000     /**< The number of wavelength bins for spectra during the ionization cycles
+#define NWAVE_IONIZ 100000     /**< The number of wavelength bins for spectra during the ionization cycles
                                 */
 #define NWAVE_MIN   100       /**< The minimum number of wavelength bins in during spectral cycles
                                */

@@ -1034,7 +1034,10 @@ scatter (p, nres, nnscat)
         prob_kpkt = 0.0;        // initialise value
         if (gamma_twiddle < 0 || gamma_twiddle_e < 0)
         {
-          Error ("scatter (resonate.c): negative net photoionization rate (stimulated recombination), set to zero\n");
+          /* log only the first few; an Error repeated max_errors times aborts the run */
+          static long n_neg_twiddle = 0;
+          if (n_neg_twiddle++ < 10)
+            Error ("scatter (resonate.c): negative net photoionization rate (stimulated recombination), set to zero (logging first 10 only)\n");
           gamma_twiddle = fmax (gamma_twiddle, 0.);
           gamma_twiddle_e = fmax (gamma_twiddle_e, 0.);
         }
