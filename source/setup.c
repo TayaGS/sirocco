@@ -349,8 +349,6 @@ init_advanced_modes ()
   modes.partial_cells = PC_ZERO_DEN;    /* Default is to omit partial cells in calculation */
 
   modes.no_macro_pops_for_ions = FALSE; /* use the ion densities from macro_pops where applicable */
-  modes.no_compton = FALSE;    /* disable Compton energy exchange when true; scattering stays elastic */
-
   return (0);
 }
 
@@ -905,9 +903,6 @@ setup_atomic_data (const char *atomic_filename)
     write_atomicdata = rdchoice ("@Diag.write_atomicdata(yes,no)", "1,0", answer);
     if (write_atomicdata)
       Log ("You have opted to save a summary of the atomic data\n");
-
-    strcpy (answer, "no");
-    modes.no_compton = rdchoice ("@Diag.no_compton(yes,no)", "0,1", answer);
   }
 
   /*

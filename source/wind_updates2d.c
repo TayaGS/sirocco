@@ -146,7 +146,7 @@ wind_update (WindPtr w)
     }
     else if (geo.use_user_defined_heating)
     {
-      Log ("Using user defined heating for cell %d in domain %d\n", n_plasma, w[nwind].ndom);
+      Debug ("Using user defined heating for cell %d in domain %d\n", n_plasma, w[nwind].ndom);
       /* usr_heat: imported heating is precomputed and cached in plasmamain[n_plasma].heat_shock. */
     }
     else

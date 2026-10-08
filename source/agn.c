@@ -106,14 +106,14 @@ agn_init (r, lum, alpha, freqmin, freqmax, ioniz_or_extract, f)
     t = alpha;
     emit = emittance_bb (freqmin, freqmax, t);
     emit *= (4. * PI * r * r);
-    bb_lum = 4. * PI * r * r * STEFAN_BOLTZMANN * pow (t, 4.0);
+    bb_lum = 4. * PI * r * r * STEFAN_BOLTZMANN * pow (t, 4.0); //The luminosity of a blackbody ignoring dilution
 
     if (bb_lum <= 0.0)
     {
       Error ("agn_init: dilute_blackbody has non-positive bb_lum for T=%g\n", t);
       Exit (0);
     }
-    *f = emit * (lum / bb_lum);
+    *f = emit * (lum / bb_lum); //applying a dilution factor
   }
   else if (spectype == SPECTYPE_CL_TAB) //A special broken power law mode made to match cloudy - mainly for testing purposes
   {

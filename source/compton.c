@@ -41,7 +41,6 @@ compton_scatter (p)
 {
   double t_e;
   double vel[3];
-  double lmn[3];
   double v;
 
 
@@ -49,13 +48,6 @@ compton_scatter (p)
   PlasmaPtr xplasma;
   one = &wmain[p->grid];
   xplasma = &plasmamain[one->nplasma];
-
-  if (modes.no_compton)
-  {
-    randvdipole (lmn, p->lmn);
-    stuff_v (lmn, p->lmn);
-    return (0);
-  }
 
 
 
@@ -170,9 +162,6 @@ kappa_comp (xplasma, freq)
      PlasmaPtr xplasma;
      double freq;
 {
-  if (modes.no_compton)
-    return (0.0);
-
   double x;
   double sigma;                 /*The cross section, thompson, or KN if hnu/mec2 > 0.01 */
   int ndom;
@@ -216,9 +205,6 @@ kappa_ind_comp (xplasma, freq)
      PlasmaPtr xplasma;
      double freq;
 {
-  if (modes.no_compton)
-    return (0.0);
-
   double x;
   double sigma;                 /*The cross section, thompson, or KN if hnu/mec2 > 0.01 */
   double J;                     //The estimated intensity in the cell
@@ -295,9 +281,6 @@ total_comp (one, t_e)
      WindPtr one;
      double t_e;
 {
-  if (modes.no_compton)
-    return (0.0);
-
   double x, f1, f2;
   int nplasma, j;
 
@@ -707,8 +690,6 @@ double
 compton_alpha (nu)
      double nu;
 {
-   if (modes.no_compton)
-    return (0.0);
   double alpha;
   if (nu < 1e17)
     alpha = 1.0;
@@ -741,9 +722,6 @@ double
 compton_beta (nu)
      double nu;
 {
-  if (modes.no_compton)
-    return (0.0);
-
   double alp, beta;
   if (nu < 1e17)
     beta = 1.0;

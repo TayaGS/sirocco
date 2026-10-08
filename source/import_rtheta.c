@@ -79,7 +79,7 @@ import_rtheta (ndom, filename)
   int n, icell, jcell, ncell, inwind;
   int jz, jx;
   double delta;
-  double r, theta, v_x, v_y, v_z, rho, t_r, t_e;
+  double r, theta, v_x, v_y, v_z, rho, t_r, t_e, heating;
   double mid_z;
 
 
@@ -96,7 +96,9 @@ import_rtheta (ndom, filename)
   ncell = 0;
   while (fgets (line, LINELENGTH, fptr) != NULL)
   {
-    n = sscanf (line, " %d %d %d %le %le %le %le %le %le %le %le", &icell, &jcell, &inwind, &r, &theta, &v_x, &v_y, &v_z, &rho, &t_e, &t_r);
+    heating = 0.0;
+    n = sscanf (line, " %d %d %d %le %le %le %le %le %le %le %le %le", &icell, &jcell, &inwind, &r, &theta, &v_x, &v_y, &v_z, &rho, &t_e, &t_r,
+                &heating);
 
     if (n < READ_NO_TEMP_2D)
     {
@@ -113,6 +115,7 @@ import_rtheta (ndom, filename)
       imported_model[ndom].v_y[ncell] = v_y;
       imported_model[ndom].v_z[ncell] = v_z;
       imported_model[ndom].mass_rho[ncell] = rho;
+      imported_model[ndom].heating[ncell] = heating;    // usr_heat: 0 unless a 12th column is given
 
       if (n == READ_ELECTRON_TEMP_2D)
       {
@@ -120,7 +123,7 @@ import_rtheta (ndom, filename)
         imported_model[ndom].t_e[ncell] = t_e;
         imported_model[ndom].t_r[ncell] = 1.1 * t_e;
       }
-      else if (n == READ_BOTH_TEMP_2D)
+      else if (n == READ_BOTH_TEMP_2D || n == READ_BOTH_TEMP_HEATING_2D)
       {
         imported_model[ndom].init_temperature = FALSE;
         imported_model[ndom].t_e[ncell] = t_e;

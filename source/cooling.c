@@ -109,7 +109,9 @@ cooling (xplasma, t)
  * ### Notes ###
  *
  * It returns the total cooling in the CMF, and also cooling due
-* to various types of emission, e.g ff and  lines into the
+ * to various types of emission, e.g ff and  lines into the
+ * Plasma cells. The fb cooling calculated here is *not* equal to
+ * the fb luminosity and so this value is stored in cool_rr.
  *
  * @bug The call to this routine was changed when PlasmaPtrs
  * were introduced, but it appears that the various routines
