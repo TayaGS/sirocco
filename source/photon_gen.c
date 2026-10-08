@@ -648,6 +648,10 @@ xmake_phot (p, f1, f2, ioniz_or_extract, iwind, weight, iphot_start, nphotons)
       nbl += (nphotons - nphot);
     else if (nagn > 0)
       nagn += (nphotons - nphot);
+    else if (nmatom > 0)
+      nmatom += (nphotons - nphot);
+    else if (nkpkt > 0)
+      nkpkt += (nphotons - nphot);
     else
       nstar += (nphotons - nphot);
   }
