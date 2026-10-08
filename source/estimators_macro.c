@@ -158,7 +158,7 @@ bf_estimators_increment (one, p, ds)
         weight_of_packet = p->w;
         y = weight_of_packet * x * ds;
 
-        exponential = y * exp (-(freq_av - ft) / BOLTZMANN / xplasma->t_e);
+        exponential = y * exp (-H_OVER_K * (freq_av - ft) / xplasma->t_e);
 
         /* Increment the photoionization rate estimator */
 
@@ -399,7 +399,7 @@ normalise_macro_estimators (PlasmaPtr xplasma)
 {
   double invariant_volume_time;
   int i, j, nlev_upper;
-  double stimfac, line_freq, stat_weight_ratio;
+  double stimfac, stim_correction, line_freq, stat_weight_ratio;
   double heat_contribution, lower_density, upper_density;
   WindPtr one;
   MacroPtr mplasma;
@@ -452,7 +452,7 @@ normalise_macro_estimators (PlasmaPtr xplasma)
          ratio of statistical weights too. For free electron statistical
          weight = 2 is included in stimfac above. */
 
-      stat_weight_ratio = xconfig[phot_top[xconfig[i].bfu_jump[j]].uplev].g / xconfig[i].g;
+      stat_weight_ratio = xconfig[i].g / xconfig[phot_top[xconfig[i].bfu_jump[j]].uplev].g;
 
       mplasma->alpha_st_old[xconfig[i].bfu_indx_first + j] =
         mplasma->alpha_st[xconfig[i].bfu_indx_first + j] * stimfac * stat_weight_ratio / PLANCK / invariant_volume_time;
@@ -498,12 +498,12 @@ normalise_macro_estimators (PlasmaPtr xplasma)
 
       /* The correction for stimulated emission is (1 - n_lower * g_upper / n_upper / g_lower) */
 
-      stimfac = upper_density / lower_density;
-      stimfac = stimfac * xconfig[i].g / xconfig[line[xconfig[i].bbu_jump[j]].nconfigu].g;
+      stim_correction = upper_density / lower_density;
+      stim_correction = stim_correction * xconfig[i].g / xconfig[line[xconfig[i].bbu_jump[j]].nconfigu].g;
 
-      if (stimfac < 1.0 && stimfac >= 0.0)
+      if (stim_correction < 1.0 && stim_correction >= 0.0)
       {
-        stimfac = 1. - stimfac;
+        stim_correction = 1. - stim_correction;
       }
       else if (upper_density > DENSITY_PHOT_MIN && lower_density > DENSITY_PHOT_MIN
                && xplasma->levden[xconfig[nlev_upper].nden] > DENSITY_MIN)
@@ -511,21 +511,21 @@ normalise_macro_estimators (PlasmaPtr xplasma)
         /* check for population inversions. We don't worry about this if the densities are extremely low or if the
            upper level has hit the density floor - the lower level is still allowed to hit this floor because it
            should never cause an inversion */
-        Error ("normalise_macro_estimators: bb stimulated correction factor is out of bounds, 0 <= stimfac < 1 but got %g\n", stimfac);
+        Error ("normalise_macro_estimators: bb stimulated correction factor is out of bounds, 0 <= stim_correction < 1 but got %g\n", stim_correction);
         Error ("normalise_macro_estimators: upper_density %g lower_density %g xplasma->levden[config[nlev_upper].nden] %g\n",
                upper_density, lower_density, xplasma->levden[xconfig[nlev_upper].nden]);
-        stimfac = 0.0;
+        stim_correction = 0.0;
       }
       else
       {
-        stimfac = 0.0;
+        stim_correction = 0.0;
       }
 
       /* normalise jbar. Note that this uses the cell volume rather than the filled volume */
 
       line_freq = line[xconfig[i].bbu_jump[j]].freq;
       mplasma->jbar_old[xconfig[i].bbu_indx_first + j] =
-        mplasma->jbar[xconfig[i].bbu_indx_first + j] * VLIGHT * stimfac / 4. / PI / invariant_volume_time / line_freq;
+        mplasma->jbar[xconfig[i].bbu_indx_first + j] * VLIGHT * stim_correction / 4. / PI / invariant_volume_time / line_freq;
       mplasma->jbar[xconfig[i].bbu_indx_first + j] = 0.0;
     }
   }
@@ -536,13 +536,19 @@ normalise_macro_estimators (PlasmaPtr xplasma)
 
   xplasma->heat_lines += heat_contribution = macro_bb_heating (xplasma, xplasma->t_e);
   xplasma->heat_lines_macro = heat_contribution;
-  xplasma->heat_tot += heat_contribution;
 
   /* Get the bf heating contributions here too. (SS June 04) */
+  /* JM Oct 2025 -- we now separate out three body recombination and photoionization heating */
+  /* so that we can track them separately */
 
-  xplasma->heat_photo += heat_contribution = macro_bf_heating (xplasma, xplasma->t_e);
+  xplasma->heat_photo += heat_contribution = macro_photo_heating (xplasma, xplasma->t_e);
   xplasma->heat_photo_macro = heat_contribution;
-  xplasma->heat_tot += heat_contribution;
+
+  xplasma->heat_photo += heat_contribution = macro_qrecomb_heating (xplasma, xplasma->t_e);
+  xplasma->heat_qrecomb_macro = heat_contribution;
+
+  /* ensure the total heating is incremented too, for line and bound-free */
+  xplasma->heat_tot += xplasma->heat_lines_macro + xplasma->heat_photo_macro + xplasma->heat_qrecomb_macro;
 
   /* finally, check if we have any places where stimulated recombination wins over
      photoionization */
@@ -556,6 +562,13 @@ normalise_macro_estimators (PlasmaPtr xplasma)
   /* force recalculation of k-packet rates and matrices, if applicable */
   mplasma->kpkt_rates_known = FALSE;
   mplasma->matrix_rates_known = FALSE;
+
+  /* record a total energy flow into macro-atoms, by summing over all matom_abs contributions */
+  mplasma->energy_flow_in = 0.0;
+  for (i = 0; i < nlevels_macro; i++)
+  {
+    mplasma->energy_flow_in += mplasma->matom_abs[i];
+  }
 
   return (0);
 }
@@ -597,7 +610,6 @@ total_fb_matoms (xplasma, t_e, f1, f2)
   struct topbase_phot *cont_ptr;
   double total, density;
   int i, j;
-  double q_ioniz ();
   MacroPtr mplasma;
 
   mplasma = &macromain[xplasma->nplasma];
@@ -630,12 +642,6 @@ total_fb_matoms (xplasma, t_e, f1, f2)
            - mplasma->alpha_st_old[xconfig[i].bfu_indx_first + j]
            - alpha_sp (cont_ptr, xplasma, 0)) * PLANCK * phot_top[xconfig[i].bfu_jump[j]].freq[0] * density * xplasma->ne * xplasma->vol;
 
-        /* Now add the collisional ionization term. */
-        density = den_config (xplasma, cont_ptr->nlev);
-        cool_contribution +=
-          q_ioniz (cont_ptr, t_e) * density * xplasma->ne * PLANCK * phot_top[xconfig[i].bfu_jump[j]].freq[0] * xplasma->vol;
-
-        /* That's the bf cooling contribution. */
         total += cool_contribution;
       }
     }
@@ -646,6 +652,58 @@ total_fb_matoms (xplasma, t_e, f1, f2)
 
   return (total);
 }
+
+
+/**********************************************************/
+/**
+ * @brief      computes the cooling rate due to collisional ionization in macro-atoms 
+ *
+ * @param [in] PlasmaPtr  xplasma 
+ * @param [in] double  t_e  electron temperature
+ * @param [in] double  f1  lower frequency
+ * @param [in] double  f2  upper frequency
+ * @return total
+ *
+ * @details
+ * computes the cooling rate due to collisional ionization in macro-atoms 
+ * 
+ **********************************************************/
+
+double
+cooling_di_matoms (xplasma, t_e, f1, f2)
+     PlasmaPtr xplasma;
+     double t_e;
+     double f1, f2;
+{
+  double cool_contribution;
+  struct topbase_phot *cont_ptr;
+  double total, density;
+  int i, j;
+
+  total = 0;
+
+  if (geo.macro_simple == FALSE)        //allow for "only-simple" calculations (SS May04)
+  {
+    for (i = 0; i < nlte_levels; i++)
+    {
+      for (j = 0; j < xconfig[i].n_bfu_jump; j++)
+      {
+        /* Need the density for the lower level in the ionization process. */
+        cont_ptr = &phot_top[xconfig[i].bfu_jump[j]];
+
+        /* Now add the collisional ionization term. */
+        density = den_config (xplasma, cont_ptr->nlev);
+        cool_contribution =
+          q_ioniz (cont_ptr, t_e) * density * xplasma->ne * PLANCK * phot_top[xconfig[i].bfu_jump[j]].freq[0] * xplasma->vol;
+
+        total += cool_contribution;
+      }
+    }
+  }
+
+  return (total);
+}
+
 
 /**********************************************************/
 /**
@@ -763,27 +821,25 @@ macro_bb_heating (xplasma, t_e)
 
 /**********************************************************/
 /**
- * @brief computes the total heating due to bf transitions for macro atoms.
+ * @brief computes the total heating due to photoionization for macro atoms.
  *
  * @param [in] PlasmaPtr  xplasma  
  * @param [in] double t_e   electron temperature
  * @return total 
  *
  * @details
- * computes the total heating due to bf transitions for macro atoms. 
- * The heating in simple ions
- * is taken care of elsewhere. 
+ * computes the total heating due to bf transitions for macro atoms, not including the three body recombination part. 
+ * The heating in simple ions is taken care of elsewhere. 
  * It is used by the heating/cooling calculation to get the temperature.
- *
  **********************************************************/
 
 double
-macro_bf_heating (xplasma, t_e)
+macro_photo_heating (xplasma, t_e)
      PlasmaPtr xplasma;
      double t_e;
 {
   double heat_contribution;
-  double total, upper_density, lower_density;
+  double total, lower_density;
   int i, j;
   double q_recomb ();
   MacroPtr mplasma;
@@ -804,6 +860,44 @@ macro_bf_heating (xplasma, t_e)
          mplasma->gamma_old[xconfig[i].bfu_indx_first +
                             j]) * PLANCK * phot_top[xconfig[i].bfu_jump[j]].freq[0] * lower_density * xplasma->vol;
 
+      total += heat_contribution;
+    }
+  }
+
+  return (total);
+}
+
+
+/**********************************************************/
+/**
+ * @brief computes the total heating due to threebody recombination bf transitions for macro atoms.
+ *
+ * @param [in] PlasmaPtr  xplasma  
+ * @param [in] double t_e   electron temperature
+ * @return total 
+ *
+ * @details
+ * computes the total heating due to the three body recombination part for macro atoms. 
+ * The heating in simple ions is taken care of elsewhere. 
+ * It is used by the heating/cooling calculation to get the temperature.
+ **********************************************************/
+
+double
+macro_qrecomb_heating (xplasma, t_e)
+     PlasmaPtr xplasma;
+     double t_e;
+{
+  double heat_contribution;
+  double total, upper_density;
+  int i, j;
+
+  total = 0;                    // initialise
+
+  for (i = 0; i < nlte_levels; i++)
+  {
+    for (j = 0; j < xconfig[i].n_bfu_jump; j++)
+    {
+      heat_contribution = 0.0;
       /* Three body recombination part. */
       upper_density = den_config (xplasma, phot_top[xconfig[i].bfu_jump[j]].uplev);
       heat_contribution +=
@@ -916,7 +1010,7 @@ check_stimulated_recomb (xplasma)
       cont_ptr = &phot_top[xconfig[i].bfu_jump[j]];
       gamma = mplasma->gamma_old[xconfig[i].bfu_indx_first + j];
       st_recomb = mplasma->alpha_st_old[xconfig[i].bfu_indx_first + j];
-      st_recomb *= xplasma->ne * den_config (xplasma, cont_ptr->uplev) / den_config (xplasma, cont_ptr->nlev);
+      st_recomb *= stim_recomb_factor (xplasma, cont_ptr);
       coll_ioniz = q_ioniz (cont_ptr, xplasma->t_e) * xplasma->ne;
 
       if (st_recomb > (gamma + coll_ioniz))
