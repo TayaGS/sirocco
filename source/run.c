@@ -577,6 +577,8 @@ make_spectra (restart_stat)
     modes.load_rng = FALSE;
   }
 
+  cell_spec_extract_init ();
+
   while (geo.pcycle < geo.pcycles)
   {                             /* This allows you to build up photons in bunches */
 
@@ -649,6 +651,8 @@ make_spectra (restart_stat)
 #ifdef MPI_ON
     }
 #endif
+
+    cell_spec_extract_write (); /* called on all ranks, as it reduces the cell spectra */
     Log ("Completed spectrum cycle %3d :  The elapsed TIME was %f\n", geo.pcycle + 1, timer ());
 
     /* JM1304: moved geo.pcycle++ after xsignal to record cycles correctly. First cycle is cycle 0. */

@@ -45,6 +45,12 @@ int bilin(double x[], double x00[], double x01[], double x10[], double x11[], do
 double integ_brem(double freq, void *params);
 double brem_d(double alpha, void *params);
 double get_rand_brem(double freqmin, double freqmax);
+/* cell_spec_extract.c */
+int cell_spec_extract_read_params(void);
+int cell_spec_extract_init(void);
+void cell_spec_extract_counting(int on);
+int cell_spec_extract_increment(PhotPtr p, double ds, double w_ave);
+int cell_spec_extract_write(void);
 /* cdf.c */
 int cdf_gen_from_func(CdfPtr cdf, double (*func)(double, void *), double xmin, double xmax, int njumps, double jump[]);
 double gen_array_from_func(double (*func)(double, void *), double xmin, double xmax, int pdfsteps);

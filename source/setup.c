@@ -354,6 +354,7 @@ init_advanced_modes ()
 
   modes.no_macro_pops_for_ions = FALSE; /* use the ion densities from macro_pops where applicable */
   modes.early_stopping = FALSE; /* convergence-based early stopping of ionization cycles */
+  modes.cell_spec_extract = FALSE;      /* high resolution cell spectra in the spectral cycles */
 
   return (0);
 }

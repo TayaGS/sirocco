@@ -514,6 +514,10 @@ main (argc, argv)
     init_observers ();
   }
 
+  /* Outside the block above, which is skipped when a restart continues the spectral cycles */
+  if (modes.cell_spec_extract && geo.pcycles > geo.pcycle)
+    cell_spec_extract_read_params ();
+
   geo.matom_radiation = 0;      //initialise for ionization cycles - don't use pre-computed emissivities for macro-atom levels/ k-packets.
   get_standard_care_factors ();
   get_meta_params ();

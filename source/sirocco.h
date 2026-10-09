@@ -1686,6 +1686,9 @@ struct advanced_modes
                                    * cycles. Set by the -early_stopping command line switch. When active,
                                    * sirocco queries the user for @estop parameters in the .pf file.
                                    */
+  int cell_spec_extract;          /**< when TRUE, accumulate high resolution cell spectra in the spectral
+                                   * cycles (see cell_spec_extract.c). Set by the -cell_spec command line switch.
+                                   */
 };
 
 extern struct advanced_modes modes;

@@ -240,6 +240,12 @@ parse_command_line (argc, argv)
         Log ("Enabling convergence-based early stopping of ionization cycles\n");
         j = i;
       }
+      else if (strcmp (argv[i], "-cell_spec") == 0)
+      {
+        modes.cell_spec_extract = 1;
+        Log ("Accumulating cell spectra in the spectral cycles\n");
+        j = i;
+      }
       else if (strcmp (argv[i], "-i") == 0)
       {
         modes.quit_after_inputs = 1;
@@ -416,6 +422,8 @@ These are largely diagnostic or for special cases. These include\n\
  -no-matrix-storage     Do not store macro-atom transition matrices if using the macro-atom line transfer and the matrix matom_transition_mode.\n\
  -early_stopping        Enable convergence-based early stopping of ionization cycles. Sirocco will then query\n\
                         the user for @estop parameters controlling when to stop early.\n\
+ -cell_spec             Accumulate high resolution spectra of each wind cell in the spectral cycles and write them\n\
+                        to root.cell_spec.txt. Sirocco will then query for the Spectrum.cell_spec parameters.\n\
 \n\
  -xtest                 Instead of running sirocco, call the routine xtest so that one can diagnose issues associted with the \n\
                         setup.  This is only useful to devlopers \n\

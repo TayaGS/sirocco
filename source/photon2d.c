@@ -440,6 +440,7 @@ translate_in_wind (w, p, tau_scat, tau, nres)
 {
   int n;
   double smax, ds_current, ds_cmf;
+  double w_start;
   int istat;
   int nplasma;
 
@@ -508,6 +509,8 @@ translate_in_wind (w, p, tau_scat, tau, nres)
      * the weight of the photon due to continuum absorption, e.g. free free.
      */
 
+    w_start = p->w;
+
     if (geo.rt_mode == RT_MODE_MACRO)
     {
       /* In the macro-method, b-f and other continuum processes do not reduce the photon
@@ -536,6 +539,9 @@ translate_in_wind (w, p, tau_scat, tau, nres)
     {
       radiation (p, ds_current);
     }
+
+    /* Spectral cycle cell spectra (if -cell_spec); radiation may have reduced the weight along ds */
+    cell_spec_extract_increment (p, ds_current, 0.5 * (w_start + p->w));
 
     if (*nres > -1 && *nres <= NLINES && *nres == p->nres && istat == P_SCAT)
     {

@@ -236,7 +236,9 @@ trans_phot_single (WindPtr w, PhotPtr p, int iextract)
        photon at the position of it's last scatter.  In most other cases though we store the final 
        position of the photon. */
 
+    cell_spec_extract_counting (TRUE);  /* so photons extracted towards observers are not counted */
     istat = translate (w, &pp, tau_scat, &tau, &current_nres);
+    cell_spec_extract_counting (FALSE);
 
     if (istat == P_ERROR)
     {
